@@ -3,9 +3,9 @@
 
 -- this prepares and returns a string to be used by the helper BitmapText
 -- at the top of the screen (one for each player)
-local function GetSpeedModHelperText(pn)
+local function GetSpeedModText(pn)
 	local bpm
-	local display = ""
+	local text = ""
 	local mods = SL[pn].ActiveModifiers
 	local speed = mods.SpeedMod
 
@@ -25,19 +25,19 @@ local function GetSpeedModHelperText(pn)
 
 		--if a single bpm suffices
 		if bpm[1] == bpm[2] then
-			display = string.format("%.2f", speed) .. "x (" .. round(speed * bpm[1] * musicrate) .. ")"
+			text = string.format("%.2f", speed) .. "x (" .. round(speed * bpm[1] * musicrate) .. ")"
 
 		-- if we have a range of bpms
 		else
-			display = string.format("%.2f", speed) .. "x (" .. round(speed * bpm[1] * musicrate) .. " - " .. round(speed * bpm[2] * musicrate) .. ")"
+			text = string.format("%.2f", speed) .. "x (" .. round(speed * bpm[1] * musicrate) .. " - " .. round(speed * bpm[2] * musicrate) .. ")"
 		end
 
 	-- elseif using a CMod or an MMod
 	elseif mods.SpeedModType == "C" or mods.SpeedModType == "M" then
-		display = mods.SpeedModType .. tostring(speed)
+		text = mods.SpeedModType .. tostring(speed)
 	end
 
-	return display
+	return text
 end
 
 local increments = {
@@ -76,8 +76,6 @@ local function FindOptionRowIndex(ScreenOptions, Name)
 			return i
 		end
 	end
-
-	return false
 end
 
 ------------------------------------------------------------
@@ -92,11 +90,11 @@ local t = Def.ActorFrame{
 	InitCommand=cmd(xy,_screen.cx,0),
 	OnCommand=cmd(diffusealpha,0; linear,0.2;diffusealpha,1; queuecommand,"Capture"),
 	OffCommand=cmd(linear,0.2; diffusealpha,0),
-	CaptureCommand=function(self)
 
+	CaptureCommand=function(self)
 		local ScreenOptions = SCREENMAN:GetTopScreen()
 
-		for player in ivalues( GAMESTATE:GetHumanPlayers() ) do
+		for _, player in ipairs( GAMESTATE:GetHumanPlayers() ) do
 			local pn = ToEnumShortString(player)
 			local SpeedModRowIndex = FindOptionRowIndex(ScreenOptions,"SpeedMod")
 
@@ -106,56 +104,21 @@ local t = Def.ActorFrame{
 				self:playcommand("Set"..pn)
 			end
 		end
+	end,
+	MusicRateChangedMessageCommand=function(self)
+		for _, player in ipairs( GAMESTATE:GetHumanPlayers() ) do
+			self:queuecommand("Set"..ToEnumShortString(player))
+		end
 	end
 }
 
-local game_name = GAMESTATE:GetCurrentGame():GetName()
-local column = {
-	dance = "Up",
-	pump = "UpRight",
-	techno = "Up",
-	kb7 = "Key1"
-}
+-- attach NoteSkin actors and Judgment graphic actors to this overlay ActorFrame
+-- they'll each be hidden immediately via visible(false) and referred to as needed
+-- via ActorProxy in ./Graphics/OptionRow Frame.lua
+LoadActor("./NoteSkinActors.lua", t)
+LoadActor("./JudgmentGraphics.lua", t)
 
-local GetNoteSkinActor = function(ns)
-
-	local status, noteskin_actor = pcall(NOTESKIN.LoadActorForNoteSkin, NOTESKIN, column[game_name] or "Up", "Tap Note", ns)
-
-	if noteskin_actor then
-		return noteskin_actor..{
-			Name="NoteSkin_"..ns,
-			InitCommand=function(self) self:visible(false) end
-		}
-	else
-		SM( Screen.String("NoteSkinErrors"):format(ns) )
-
-		return Def.Actor{
-			Name="NoteSkin_"..ns,
-			InitCommand=function(self) self:visible(false) end
-		}
-	end
-end
-
--- Add noteskin actors to the primary AF and hide them immediately.
--- We'll refer to these later via ActorProxy in ./Graphics/OptionRow Frame.lua
-for noteskin in ivalues( CustomOptionRow("NoteSkin").Choices ) do
-	t[#t+1] = GetNoteSkinActor(noteskin)
-end
-
-
-for judgment_filename in ivalues( GetJudgmentGraphics(SL.Global.GameMode) ) do
-	if judgment_filename ~= "None" then
-		t[#t+1] = LoadActor( THEME:GetPathG("", "_judgments/" .. SL.Global.GameMode .. "/" .. judgment_filename) )..{
-			Name="JudgmentGraphic_"..StripSpriteHints(judgment_filename),
-			InitCommand=function(self) self:visible(false):animate(false) end
-		}
-	else
-		t[#t+1] = Def.Actor{ Name="JudgmentGraphic_None", InitCommand=function(self) self:visible(false) end }
-	end
-end
-
-
-
+-- some functionality needed in both PlayerOptions and PlayerOptions2
 t[#t+1] = LoadActor(THEME:GetPathB("ScreenPlayerOptions", "common"))
 
 for player in ivalues(Players) do
@@ -195,7 +158,7 @@ for player in ivalues(Players) do
 
 					SL[pn].ActiveModifiers.SpeedMod = (round((oldspeed * bpm[2]) / increments[newtype])) * increments[newtype]
 				elseif newtype == "x" then
-					-- revert rate compensation since its handled for XMod
+					-- revert rate compensation since it's handled for XMod
 					oldspeed = oldspeed / SL.Global.ActiveModifiers.MusicRate
 
 					SL[pn].ActiveModifiers.SpeedMod = (round(oldspeed / bpm[2] / increments[newtype])) * increments[newtype]
@@ -209,20 +172,8 @@ for player in ivalues(Players) do
 		end,
 
 		["Set" .. pn .. "Command"]=function(self)
-			local text = ""
-
-			if  SL[pn].ActiveModifiers.SpeedModType == "x" then
-				text = string.format("%.2f" , SL[pn].ActiveModifiers.SpeedMod ) .. "x"
-
-			elseif  SL[pn].ActiveModifiers.SpeedModType == "C" then
-				text = "C" .. tostring(SL[pn].ActiveModifiers.SpeedMod)
-
-			elseif  SL[pn].ActiveModifiers.SpeedModType == "M" then
-				text = "M" .. tostring(SL[pn].ActiveModifiers.SpeedMod)
-			end
-
+			local text = GetSpeedModText(pn)
 			SpeedModItems[pn]:settext( text )
-			self:GetParent():GetChild(pn .. "SpeedModHelper"):settext( GetSpeedModHelperText(pn) )
 		end,
 
 		["MenuLeft" .. pn .. "MessageCommand"]=function(self)
@@ -244,20 +195,6 @@ for player in ivalues(Players) do
 			end
 		end
 	}
-
-	-- the display that does math for you up at the top
-	t[#t+1] = LoadFont("_wendy small")..{
-		Name=pn.."SpeedModHelper",
-		Text="",
-		InitCommand=function(self)
-			self:diffuse(PlayerColor(player)):diffusealpha(0)
-			self:zoom(0.5):y(48)
-			self:x(player==PLAYER_1 and -100 or 150)
-			self:shadowlength(0.55)
-		end,
-		OnCommand=cmd(linear,0.4;diffusealpha,1)
-	}
-
 
 	t[#t+1] = LoadFont("_miso")..{
 		Name=pn.."MusicRateHelper",
@@ -284,7 +221,7 @@ for player in ivalues(Players) do
 			local ScreenOptions = SCREENMAN:GetTopScreen()
 			local SpeedModRowIndex = FindOptionRowIndex(ScreenOptions, "SpeedMod")
 
-			-- the speedmod row doesn't exist for ScreenAttackMenu, and SpeedModRowIndex will be false
+			-- the speedmod row doesn't exist for ScreenAttackMenu, and SpeedModRowIndex will be nil
 			if SpeedModRowIndex then
 
 				local musicrate = SL.Global.ActiveModifiers.MusicRate
@@ -299,9 +236,6 @@ for player in ivalues(Players) do
 				else
 					self:settext("")
 				end
-
-				-- settext on the speedmod helper
-				self:GetParent():GetChild(pn .. "SpeedModHelper"):settext( GetSpeedModHelperText(pn) )
 
 				local SpeedModTitle = ScreenOptions:GetOptionRow(SpeedModRowIndex):GetChild(""):GetChild("Title")
 				local bpms = GetDisplayBPMs()
