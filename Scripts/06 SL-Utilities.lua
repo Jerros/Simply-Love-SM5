@@ -193,3 +193,22 @@ function map(func, array)
 	end
 	return new_array
 end
+
+function ReloadProfiles()
+	if GAMESTATE:IsEventMode() == false then
+		return
+	end
+
+	local change = true
+	for pn in ivalues( GAMESTATE:GetHumanPlayers() ) do
+		local state = MEMCARDMAN:GetCardState(pn)
+		if state == "MemoryCardState_late" or state == "MemoryCardState_error" or state == 'MemoryCardState_removed' then
+			change = true
+		end
+	end
+
+	if change == true then
+		SL.Global.BranchOverride = "ScreenSelectMusic"
+		SCREENMAN:SetNewScreen("ScreenProfileLoad")
+	end
+end
