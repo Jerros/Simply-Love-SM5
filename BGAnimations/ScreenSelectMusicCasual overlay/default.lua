@@ -59,7 +59,7 @@ local t = Def.ActorFrame {
 		if not Input.AllPlayersAreAtLastRow() and seconds <= 0 then
 
 			-- if we we're not currently in the optionrows,
-			-- we'll need to iniitialize them for the current song, first
+			-- we'll need to initialize them for the current song, first
 			if Input.WheelWithFocus ~= OptionsWheel then
 				setup.InitOptionRowsForSingleSong()
 			end
@@ -94,14 +94,14 @@ local t = Def.ActorFrame {
 		-- I'm using Metrics-based code detection because the engine is already good at handling
 		-- simultaneous button presses (CancelSingleSong when ThreeKeyNavigation=1),
 		-- as well as long input patterns (Exit from EventMode) and I see no need to
-		-- reinvent that funtionality for the Lua InputCallback that I'm using otherwise.
+		-- reinvent that functionality for the Lua InputCallback that I'm using otherwise.
 
 		if params.Name == "Exit" then
 			if PREFSMAN:GetPreference("EventMode") then
 				SCREENMAN:GetTopScreen():SetNextScreenName( Branch.SSMCancel() ):StartTransitioningScreen("SM_GoToNextScreen")
 			else
 				if SL.Global.Stages.PlayedThisGame == 0 then
-					SL.Global.GameMode = "Competitive"
+					SL.Global.GameMode = "ITG"
 					SetGameModePreferences()
 					THEME:ReloadMetrics()
 					SCREENMAN:GetTopScreen():SetNextScreenName("ScreenReloadSSM"):StartTransitioningScreen("SM_GoToNextScreen")
@@ -136,8 +136,8 @@ local t = Def.ActorFrame {
 	LoadActor("./PlayerOptionsShared.lua", {row, col, Input}),
 	LoadActor("./SongWheelShared.lua", {row, col, songwheel_y_offset}),
 
-	-- commented out for now
-	-- LoadActor("./GroupWheelShared.lua", {row, col, group_info}),
+	-- included, but unused for now
+	LoadActor("./GroupWheelShared.lua", {row, col, group_info}),
 
 	SongWheel:create_actors( "SongWheel", 12, song_mt, 0, songwheel_y_offset),
 
@@ -149,7 +149,7 @@ local t = Def.ActorFrame {
 }
 
 -- Add player options ActorFrames to our primary ActorFrame
-for pn in ivalues( {PLAYER_1, PLAYER_2} ) do
+for pn in ivalues( PlayerNumber ) do
 	local x_offset = (pn==PLAYER_1 and -1) or 1
 
 	-- create an optionswheel that has enough items to handle the number of optionrows necessary
@@ -164,7 +164,7 @@ for pn in ivalues( {PLAYER_1, PLAYER_2} ) do
 end
 
 -- FIXME: This is dumb.  Add the player option StartButton visual last so it
---  draws over everything else and we can hide cusors behind it when needed...
+--  draws over everything else and we can hide cursors behind it when needed...
 t[#t+1] = LoadActor("./StartButton.lua")
 
 return t

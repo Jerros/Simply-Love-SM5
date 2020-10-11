@@ -1,8 +1,10 @@
-local t = Def.ActorFrame{};
+local padding    = WideScale(12, 28)
+local row_height = 30
+local row_width  = WideScale(582, 776) - (padding * 2)
 
--- a row
-t[#t+1] = Def.Quad {
-	OnCommand=cmd(zoomto,_screen.w*0.85,_screen.h*0.0625;);
-};
-
-return t;
+return Def.Quad {
+	InitCommand=function(self)
+		self:horizalign(left):x(padding)
+		self:setsize(row_width , row_height)
+	end
+}

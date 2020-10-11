@@ -1,3 +1,4 @@
-return LoadFont("_wendy small") .. {
-	Text=ScreenString("Disqualified");
-};
+return LoadFont("Common Bold")..{
+	Text=ScreenString("Disqualified"),
+	InitCommand=function(self) self:shadowlength(0.5) end
+}

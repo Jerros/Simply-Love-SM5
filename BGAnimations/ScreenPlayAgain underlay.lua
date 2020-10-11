@@ -88,7 +88,7 @@ local wheel_item_mt = {
 				end
 			}
 
-			af[#af+1] = LoadFont("_wendy small")..{
+			af[#af+1] = LoadFont("Common Bold")..{
 				InitCommand=function(subself)
 					self.text= subself
 					subself:diffusealpha(0)
@@ -136,8 +136,8 @@ local wheel_item_mt = {
 
 local t = Def.ActorFrame{
 	InitCommand=function(self)
-		--reset this now, otherwise it might still be set to SSM from a previous continue
-		--and we don't want that if a timeout occurs
+		-- reset this now, otherwise it might still be set to SSM from a previous continue
+		-- and we don't want that if a timeout occurs
 		SL.Global.ScreenAfter.PlayAgain = "ScreenEvaluationSummary"
 
 		choice_wheel:set_info_set(choices, 1)
@@ -147,9 +147,9 @@ local t = Def.ActorFrame{
 		SCREENMAN:GetTopScreen():AddInputCallback(input)
 	end,
 
-	-- I'm not sure why the built-in MenuTimer doesn't force a transition to the nextscreen
-	-- when it runs out of time, but... it isn't.  So recursively listen for time remaining here
-	-- and force a screen transition when time runs out.
+	-- I'm not sure why the built-in MenuTimer doesn't force a transition to the next
+	-- screen when it runs out of time, but... it doesn't.  So listen for time remaining
+	-- here and force a screen transition when time runs out.
 	OnCommand=function(self)
 		if PREFSMAN:GetPreference("MenuTimer") then
 			self:queuecommand("Listen")
@@ -167,13 +167,11 @@ local t = Def.ActorFrame{
 	end,
 
 	-- slightly darken the entire screen
-	Def.Quad {
-		InitCommand=cmd(FullScreen; diffuse,Color.Black; diffusealpha,0.6)
-	},
+	Def.Quad { InitCommand=function(self) self:FullScreen():diffuse(0,0,0,0.6) end },
 
-	LoadFont("_wendy small")..{
+	LoadFont("Common Bold")..{
 		Text=THEME:GetString("ScreenPlayAgain", "Continue"),
-		InitCommand=cmd(xy, _screen.cx, _screen.cy-30),
+		InitCommand=function(self) self:xy(_screen.cx, _screen.cy-30) end,
 	},
 
 	choice_wheel:create_actors( "sort_wheel", #choices, wheel_item_mt, _screen.cx, _screen.cy+50 ),

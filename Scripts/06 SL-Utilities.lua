@@ -1,9 +1,15 @@
--- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
--- Utility Functions For Development
--- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+------------------------------------------------------------
+-- 06 SL-Utilities.lua
+-- Utility Functions for Development
+--
+-- The filename starts with "06" so that it loads before other SL scripts that rely on
+-- global functions defined here.  For more information on this numbering system that
+-- pretty much no one uses, see: ./Themes/_fallback/Scripts/hierarchy.txt
+
+------------------------------------------------------------
 -- define helper functions local to this file first
 -- global utility functions (below) will depend on these
--- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+------------------------------------------------------------
 
 -- TableToString_Recursive() function via:
 -- http://www.hpelbers.org/lua/print_r
@@ -24,7 +30,7 @@ local function TableToString_Recursive(t, name, indent)
 				if next(t) then -- Table not empty
 					table.insert(out, tag .. '{')
 					for key,value in pairs(t) do
-						table.insert(out,table_r(value,key,indent .. '|  ',tableList[t]))
+						table.insert(out,table_r(value,key,indent .. '|    ',tableList[t]))
 					end
 					table.insert(out,indent .. '}')
 				else
@@ -43,58 +49,25 @@ local function TableToString_Recursive(t, name, indent)
 end
 
 
-function table.val_to_str ( v )
-	if "string" == type( v ) then
-		v = string.gsub( v, "\n", "\\n" )
-
-		if string.match( string.gsub(v,"[^'\"]",""), '^"+$' ) then
-			return "'" .. v .. "'"
-		end
-		return '"' .. string.gsub(v,'"', '\\"' ) .. '"'
-	else
-		return "table" == type( v ) and table.tostring( v ) or tostring( v )
-	end
-end
-
-function table.key_to_str ( k )
-	if "string" == type( k ) and string.match( k, "^[_%a][_%a%d]*$" ) then
-		return k
-	else
-		return "[" .. table.val_to_str( k ) .. "]"
-	end
-end
-
-function table.tostring( tbl )
-	local result, done = {}, {}
-	for k, v in ipairs( tbl ) do
-		table.insert( result, table.val_to_str( v ) )
-    	done[ k ] = true
-	end
-	for k, v in pairs( tbl ) do
-		if not done[ k ] then
-			table.insert( result, "\t" .. table.key_to_str( k ) .. "=" .. table.val_to_str( v ) )
-		end
-	end
-	return "{\n" .. table.concat( result, ",\n" ) .. "\n}"
-end
-
-
--- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+------------------------------------------------------------
 -- GLOBAL UTILITY FUNCTIONS
 -- use these to assist in theming/scripting efforts
--- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+------------------------------------------------------------
 
 -- SM()
--- Shorthand for SCREENMAN:SystemMessage(), this is useful for
--- rapid iterative testing by allowing us to print variables to the screen.
--- If passed a table, SM() will use the TableToString_Recursive (from above)
--- to display children recursively until the SystemMessage spills off the screen.
+-- Shorthand for SCREENMAN:SystemMessage(), this is useful for rapid iterative
+-- testing by allowing us to pretty-print tables and variables to the screen.
+-- If passed a table, SM() will use TableToString_Recursive (from above)
+-- to display children recursively.  Larger tables will spill offscreen, so
+-- rec_print_table() from the _fallback theme is good to know about and use when
+-- debugging.  It will recursively pretty-print table structures to ./Logs/Log.txt
+
 function SM( arg )
 
 	-- if a table has been passed in
 	if type( arg ) == "table" then
 
-		-- recurively print its contents to a string
+		-- recursively print its contents to a string
 		local msg = TableToString_Recursive(arg)
 		-- and SystemMessage() that string
 		SCREENMAN:SystemMessage( msg )
@@ -115,7 +88,7 @@ end
 -- range(-1,-3, 0.5)	--> {-1, -1.5, -2, -2.5, -3 }
 -- range(-1,-3, -0.5)	--> {-1, -1.5, -2, -2.5, -3 }
 
--- but this just doens't make sense and will return an empty table
+-- but this just doesn't make sense and will return an empty table
 -- range(1, 3, -0.5)	--> {}
 
 function range(start, stop, step)
@@ -128,7 +101,7 @@ function range(start, stop, step)
 
 	step = step or (start < stop and 1 or -1)
 
-	-- if step has been explicitly provided as a positve number
+	-- if step has been explicitly provided as a positive number
 	-- but the start and stop values tell us to decrement
 	-- multiply step by -1 to allow decrementing to occur
 	if step > 0 and start > stop then
@@ -143,10 +116,14 @@ function range(start, stop, step)
 	return t
 end
 
+-- pass in a range of time values in seconds and get back a table of stringified
+-- values formatted as minutes and seconds.
+--
+-- for example usage, see the MenuTimer OptionRows defined in ./Scripts/99 SL-ThemePrefs.lua
 function SecondsToMMSS_range(start, stop, step)
 	local ret = {}
-	local range = range(start, stop, step)
-	for v in ivalues(range) do
+	local r = range(start, stop, step)
+	for v in ivalues(r) do
 		ret[#ret+1] = SecondsToMMSS(v):gsub("^0*", "")
 	end
 	return ret
@@ -175,7 +152,9 @@ function stringify( tbl, form )
 	return t
 end
 
-
+-- iterates over a numerically-indexed table (haystack) until a desired value (needle) is found
+-- if found, return the index (number) of the desired value within the table
+-- if not found, return nil
 function FindInTable(needle, haystack)
 	for i = 1, #haystack do
 		if needle == haystack[i] then

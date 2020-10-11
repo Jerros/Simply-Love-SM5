@@ -16,9 +16,13 @@ local Update = function(af, delta)
 	if index ~= cursor.index then
 		cursor.index = index
 
-		-- queue the appropiate command to the faux playfield, if needed
-		if choices[cursor.index+1] == "Marathon" or choices[cursor.index+1] == "Regular" then
-			af:queuecommand("FirstLoop"..choices[cursor.index+1])
+		-- queue the appropriate command to the faux playfield, if needed
+		if ScreenName=="ScreenSelectPlayMode2" then
+			if choices[cursor.index+1] == "Marathon" then
+				af:queuecommand("FirstLoopMarathon")
+			else
+				af:queuecommand("FirstLoopRegular")
+			end
 		end
 
 		-- queue an "Update" to the AF containing the cursor, description text, score, and lifemeter actors
@@ -49,7 +53,7 @@ local t = Def.ActorFrame{
 		self:queuecommand("Update")
 	end,
 	OffCommand=function(self)
-		if ScreenName == "ScreenSelectPlayMode" then
+		if ScreenName=="ScreenSelectPlayMode" or ScreenName=="ScreenSelectPlayModeThonk" then
 			-- set the GameMode now; we'll use it throughout the theme
 			-- to set certain Gameplay settings and determine which screen comes next
 			SL.Global.GameMode = choices[cursor.index+1]
@@ -106,7 +110,7 @@ local t = Def.ActorFrame{
 
 	-- description
 	Def.BitmapText{
-		Font="_miso",
+		Font="Common Normal",
 		InitCommand=function(self)
 			self:zoom(0.825):halign(0):valign(0):xy(-130,-60)
 		end,
@@ -148,7 +152,7 @@ local t = Def.ActorFrame{
 
 	-- Score
 	Def.BitmapText{
-		Font="_wendy monospace numbers",
+		Font="Wendy/_wendy monospace numbers",
 		InitCommand=function(self)
 			self:zoom(0.225):xy(124,-68):diffusealpha(0)
 		end,
@@ -158,7 +162,7 @@ local t = Def.ActorFrame{
 				if choices[cursor.index+1] == "Casual" then
 					self:stoptweening():linear(0.25):diffusealpha(0)
 				else
-					if choices[cursor.index+1] == "ECFA" then
+					if choices[cursor.index+1] == "FA+" then
 						self:settext("99.50")
 					else
 						self:settext("77.41")
@@ -167,7 +171,7 @@ local t = Def.ActorFrame{
 				end
 			else
 				self:diffusealpha(1)
-				if SL.Global.GameMode == "ECFA" then
+				if SL.Global.GameMode == "FA+" then
 					self:settext("99.50")
 				else
 					self:settext("77.41")
@@ -183,17 +187,13 @@ local t = Def.ActorFrame{
 		OffCommand=function(self) self:sleep(0.4):linear(0.2):diffusealpha(0) end,
 		UpdateCommand=function(self)
 			if ScreenName == "ScreenSelectPlayMode" then
-				if choices[cursor.index+1] == "Competitive" or choices[cursor.index+1] == "ECFA" then
+				if choices[cursor.index+1] == "ITG" or choices[cursor.index+1] == "FA+" then
 					self:stoptweening():linear(0.25):diffusealpha(1)
 				else
 					self:stoptweening():linear(0.25):diffusealpha(0)
 				end
 			else
-				if SL.Global.GameMode == "StomperZ" then
-					self:diffusealpha(0)
-				else
-					self:diffusealpha(1)
-				end
+				self:diffusealpha(1)
 			end
 		end,
 		-- lifemeter white border
@@ -206,7 +206,7 @@ local t = Def.ActorFrame{
 		},
 		-- lifemeter colored quad
 		Def.Quad{
-			InitCommand=function(self) self:zoomto(40,14):xy(59,-64):diffuse( GetCurrentColor() ) end
+			InitCommand=function(self) self:zoomto(40,14):xy(59,-64):diffuse( GetCurrentColor(true) ) end
 		},
 		-- life meter animated swoosh
 		LoadActor(THEME:GetPathB("ScreenGameplay", "underlay/PerPlayer/LifeMeter/swoosh.png"))..{
@@ -216,41 +216,6 @@ local t = Def.ActorFrame{
 			end,
 		},
 	},
-	--StomperZLifeMeter
-	Def.ActorFrame{
-		Name="StomperZLifeMeter",
-		InitCommand=function(self) self:diffusealpha(0) end,
-		OffCommand=function(self) self:sleep(0.4):linear(0.2):diffusealpha(0) end,
-		UpdateCommand=function(self)
-			if ScreenName == "ScreenSelectPlayMode" then
-				if choices[cursor.index+1] == "StomperZ" then
-					self:stoptweening():linear(0.25):diffusealpha(1)
-				else
-					self:stoptweening():linear(0.25):diffusealpha(0)
-				end
-			else
-				if SL.Global.GameMode == "StomperZ" then
-					self:diffusealpha(1)
-				end
-			end
-		end,
-		LoadActor(THEME:GetPathG("", "Triangles.png"))..{
-			InitCommand=function(self) self:zoom(0.25):xy(200,10) end,
-			OnCommand=function(self)
-				self:MaskDest()
-			end,
-		},
-		-- StomperZLifeMeter left
-		Def.Quad{
-			InitCommand=function(self) self:zoomto(24,160):xy(50,28):diffuse(1,0,1,0.75):MaskDest():faderight(1) end,
-			OnCommand=function(self) self:diffuseshift():effectcolor1(1,0,1,0.75):effectcolor2(1,0,1,0.45) end
-		},
-		-- StomperZLifeMeter right
-		Def.Quad{
-			InitCommand=function(self) self:zoomto(24,160):xy(140,28):diffuse(1,0,1,0.75):MaskDest():fadeleft(1) end,
-			OnCommand=function(self) self:diffuseshift():effectcolor1(1,0,1,0.75):effectcolor2(1,0,1,0.45) end
-		},
-	}
 }
 
 t[#t+1] = LoadActor("./GameplayDemo.lua" )

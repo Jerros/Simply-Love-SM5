@@ -1,8 +1,14 @@
-local TextColor = ThemePrefs.Get("RainbowMode") and Color.Black or Color.White
+local TextColor = (ThemePrefs.Get("RainbowMode") and (not HolidayCheer()) and Color.Black) or Color.White
 
-local SongStats = SONGMAN:GetNumSongs() .. " songs in "
-SongStats = SongStats .. SONGMAN:GetNumSongGroups() .. " groups, "
-SongStats = SongStats .. #SONGMAN:GetAllCourses(PREFSMAN:GetPreference("AutogenGroupCourses")) .. " courses"
+-- generate a string like "7741 songs in 69 groups, 10 courses"
+local SongStats = ("%i %s %i %s, %i %s"):format(
+	SONGMAN:GetNumSongs(),
+	THEME:GetString("ScreenTitleMenu", "songs in"),
+	SONGMAN:GetNumSongGroups(),
+	THEME:GetString("ScreenTitleMenu", "groups"),
+	#SONGMAN:GetAllCourses(PREFSMAN:GetPreference("AutogenGroupCourses")),
+	THEME:GetString("ScreenTitleMenu", "courses")
+)
 
 -- - - - - - - - - - - - - - - - - - - - -
 local game = GAMESTATE:GetCurrentGame():GetName();
@@ -20,9 +26,17 @@ end
 local sl_name = THEME:GetCurThemeName()
 
 -- - - - - - - - - - - - - - - - - - - - -
-local sm_version = ""
+-- ProductFamily() returns "StepMania"
+-- ProductVersion() returns the (stringified) version number (like "5.0.12" or "5.1.0")
+-- so, start with a string like "StepMania 5.0.12" or "StepMania 5.1.0"
+local sm_version = ("%s %s"):format(ProductFamily(), ProductVersion())
+
+-- GetThemeVersion() is defined in ./Scripts/SL-Helpers.lua and returns the SL version from ThemeInfo.ini
 local sl_version = GetThemeVersion()
 
+-- "git" appears in ProductVersion() for non-release builds of StepMania.
+-- If a non-release executable is being used, append date information about when it
+-- was built to potentially help non-technical cabinet owners submit bug reports.
 if ProductVersion():find("git") then
 	local date = VersionDate()
 	local year = date:sub(1,4)
@@ -31,56 +45,58 @@ if ProductVersion():find("git") then
 	month = THEME:GetString("Months", "Month"..month)
 	local day = date:sub(7,8)
 
-	sm_version = ProductID() .. ", Built " .. month .. " " .. day .. ", " .. year
-else
-	sm_version = ProductID() .. sm_version
+	sm_version = ("%s, Built %s %s %s"):format(sm_version, day, month, year)
 end
 
 -- - - - - - - - - - - - - - - - - - - - -
 local style = ThemePrefs.Get("VisualTheme")
 local image = "TitleMenu"
---SSHHHH dont tell anyone ;)
-if style=="Spooky" and math.random(1,100) > 11 then
-	image="TitleMenuAlt"
+
+-- see: watch?v=wxBO6KX9qTA etc.
+if FILEMAN:DoesFileExist("/Themes/"..sl_name.."/Graphics/_VisualStyles/"..ThemePrefs.Get("VisualTheme").."/TitleMenuAlt (doubleres).png") then
+	if math.random(1,100) <= 10 then image="TitleMenuAlt" end
 end
 
 local af = Def.ActorFrame{
 	InitCommand=function(self)
-		--see: ./Scripts/SL_Initialize.lua
+		--see: ./Scripts/SL_Init.lua
 		InitializeSimplyLove()
 
 		self:Center()
 	end,
-	OffCommand=cmd(linear,0.5; diffusealpha, 0),
+	OffCommand=function(self) self:linear(0.5):diffusealpha(0) end,
+}
 
-	Def.ActorFrame{
-		InitCommand=function(self) self:zoom(0.8):y(-120):diffusealpha(0) end,
-		OnCommand=function(self) self:sleep(0.2):linear(0.4):diffusealpha(1) end,
+-- decorative arrows
+af[#af+1] = LoadActor(THEME:GetPathG("", "_logos/" .. game))..{
+	InitCommand=function(self)
+		self:y(-16):zoom( game=="pump" and 0.2 or 0.205 )
+	end
+}
 
-		LoadFont("_miso")..{
-			Text=sm_version .. "       " .. sl_name .. (sl_version and (" v" .. sl_version) or ""),
-			InitCommand=function(self) self:y(-20):diffuse(TextColor) end,
-		},
-		LoadFont("_miso")..{
-			Text=SongStats,
-			InitCommand=function(self) self:diffuse(TextColor) end,
-		}
+-- SIMPLY [something]
+af[#af+1] = LoadActor(THEME:GetPathG("", "_VisualStyles/"..style.."/"..image.." (doubleres).png"))..{
+	InitCommand=function(self) self:x(2):zoom(0.7):shadowlength(0.75) end,
+	OffCommand=function(self) self:linear(0.5):shadowlength(0) end
+}
+
+-- SM version, SL version, song stats
+af[#af+1] = Def.ActorFrame{
+	InitCommand=function(self) self:zoom(0.8):y(-120):diffusealpha(0) end,
+	OnCommand=function(self) self:sleep(0.2):linear(0.4):diffusealpha(1) end,
+
+	LoadFont("Common Normal")..{
+		Text=sm_version .. "       " .. sl_name .. (sl_version and (" v" .. sl_version) or ""),
+		InitCommand=function(self) self:y(-20):diffuse(TextColor) end,
 	},
-
-	LoadActor(THEME:GetPathG("", "_logos/" .. game))..{
-		InitCommand=function(self)
-			self:y(-16):zoom( game=="pump" and 0.2 or 0.205 )
-		end
-	},
-
-	LoadActor(THEME:GetPathG("", "_VisualStyles/"..style.."/"..image.." (doubleres).png"))..{
-		InitCommand=function(self) self:x(2):zoom(0.7):shadowlength(0.75) end,
-		OffCommand=function(self) self:linear(0.5):shadowlength(0) end
+	LoadFont("Common Normal")..{
+		Text=SongStats,
+		InitCommand=function(self) self:diffuse(TextColor) end,
 	}
 }
 
 -- the best way to spread holiday cheer is singing loud for all to hear
-if PREFSMAN:GetPreference("EasterEggs") and MonthOfYear()==11 then
+if HolidayCheer() then
 	af[#af+1] = Def.Sprite{
 		Texture=THEME:GetPathB("ScreenTitleMenu", "underlay/hat.png"),
 		InitCommand=function(self) self:zoom(0.225):xy( 130, -self:GetHeight()/2 ):rotationz(15):queuecommand("Drop") end,

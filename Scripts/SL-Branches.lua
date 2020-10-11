@@ -1,4 +1,47 @@
+------------------------------------------------------------
+-- Helper Functions for Branches
+------------------------------------------------------------
+
+local EnoughCreditsToContinue = function()
+	local credits = GetCredits().Credits
+
+	local premium = ToEnumShortString(GAMESTATE:GetPremium())
+	local styletype = ToEnumShortString(GAMESTATE:GetCurrentStyle():GetStyleType())
+
+	if premium == "2PlayersFor1Credit" then
+		return (credits > 0) -- any value greater than 0 is good enough
+
+	elseif premium == "DoubleFor1Credit" then
+		-- versus, routine, couple
+		if styletype == "TwoPlayersTwoSides" or styletype == "TwoPlayersSharedSides" then
+			return (credits > 1)
+
+		-- single, double, solo
+		else
+			return (credits > 0)
+		end
+
+	elseif premium == "Off" then
+		-- single, solo
+		if styletype == "OnePlayerOneSide" then
+			return (credits > 0)
+
+		-- versus, double, routine, couple
+		else
+			return (credits > 1)
+		end
+	end
+
+	return false
+end
+
+------------------------------------------------------------
+
 if not Branch then Branch = {} end
+
+Branch.AfterScreenRankingDouble = function()
+	return PREFSMAN:GetPreference("MemoryCards") and "ScreenMemoryCard" or "ScreenRainbow"
+end
 
 SelectMusicOrCourse = function()
 	if GAMESTATE:IsCourseMode() then
@@ -22,7 +65,6 @@ end
 
 Branch.AllowScreenSelectColor = function()
 	if ThemePrefs.Get("AllowScreenSelectColor") and not ThemePrefs.Get("RainbowMode") then
-		if ThemePrefs.Get("VisualTheme") == "Thonk" then return "ScreenSelectColorThonk" end
 		return "ScreenSelectColor"
 	else
 		return Branch.AfterScreenSelectColor()
@@ -46,7 +88,7 @@ Branch.AfterScreenSelectColor = function()
 		-- (for whatever reason), we're in a bit of a pickle, as there is
 		-- no way to read the player's mind and know which side they really
 		-- want to play on. Unjoin PLAYER_2 for lack of a better solution.
-		elseif preferred_style == "single" then
+		elseif preferred_style == "single" and GAMESTATE:GetNumSidesJoined() == 2 then
 			GAMESTATE:UnjoinPlayer(PLAYER_2)
 		end
 
@@ -54,11 +96,9 @@ Branch.AfterScreenSelectColor = function()
 		-- the engine, but I guess we're doing it here, in SL-Branches.lua, for now.
 		GAMESTATE:SetCurrentStyle( preferred_style )
 
-		if ThemePrefs.Get("VisualTheme") == "Thonk" then return "ScreenSelectPlayModeThonk" end
 		return "ScreenSelectPlayMode"
 	end
 
-	if ThemePrefs.Get("VisualTheme") == "Thonk" then return "ScreenSelectStyleThonk" end
 	return "ScreenSelectStyle"
 end
 
@@ -100,10 +140,17 @@ Branch.AfterHeartEntry = function()
 	if( pm == "Nonstop" ) then return "ScreenEvaluationNonstop" end
 end
 
-Branch.PlayerOptions = function()
+Branch.AfterSelectMusic = function()
 	if SCREENMAN:GetTopScreen():GetGoToOptions() then
 		return "ScreenPlayerOptions"
 	else
+		-- routine mode specifically uses ScreenGameplayShared
+		local style = GAMESTATE:GetCurrentStyle():GetName()
+		if style == "routine" then
+			return "ScreenGameplayShared"
+		end
+
+		-- while everything else (single, versus, double, etc.) uses ScreenGameplay
 		return "ScreenGameplay"
 	end
 end
@@ -140,33 +187,6 @@ Branch.AllowScreenEvalSummary = function()
 	end
 end
 
-
-local EnoughCreditsToContinue = function()
-	local credits = GetCredits().Credits
-	local premium = GAMESTATE:GetPremium()
-	local style = GAMESTATE:GetCurrentStyle():GetName():gsub("8", "")
-
-	if premium == "Premium_2PlayersFor1Credit" and credits > 0 then return true end
-
-	if premium == "Premium_DoubleFor1Credit" then
-		if style == "versus" then
-			if credits > 1 then return true end
-		else
-			if credits > 0 then return true end
-		end
-	end
-
-	if premium == "Premium_Off" then
-		if style == "single" then
-			if credits > 0 then return true end
-		else
-			if credits > 1 then return true end
-		end
-	end
-
-	return false
-end
-
 Branch.AfterProfileSave = function()
 
 	if PREFSMAN:GetPreference("EventMode") then
@@ -177,7 +197,7 @@ Branch.AfterProfileSave = function()
 
 	else
 
-		-- deduct the number of stages that stock Stepmania says the song is
+		-- deduct the number of stages that stock StepMania says the song is
 		local song = GAMESTATE:GetCurrentSong()
 		local SMSongCost = (song:IsMarathon() and 3) or (song:IsLong() and 2) or 1
 		SL.Global.Stages.Remaining = SL.Global.Stages.Remaining - SMSongCost
@@ -202,9 +222,8 @@ Branch.AfterProfileSave = function()
 			SL.Global.Stages.Remaining = SL.Global.Stages.Remaining + StagesToAddBack
 		end
 
-		-- Now, check if StepMania and SL disagree on the stage count
-		-- If necessary, add stages back
-		-- This might be necessary because
+		-- Now, check if StepMania and SL disagree on the stage count. If necessary, add stages back.
+		-- This might be necessary because:
 		-- a) a Lua chart reloaded ScreenGameplay, or
 		-- b) everyone failed, and StepmMania zeroed out the stage numbers
 		if GAMESTATE:GetNumStagesLeft(GAMESTATE:GetMasterPlayerNumber()) < SL.Global.Stages.Remaining then

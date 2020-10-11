@@ -4,13 +4,15 @@ local PlayerDefaults = {
 	__index = {
 		initialize = function(self)
 			self.ActiveModifiers = {
+				SpeedModType = "X",
+				SpeedMod = 1.00,
 				JudgmentGraphic = "Love 2x6.png",
+				ComboFont = "Wendy",
+				HoldJudgment = "Love 1x2.png",
+				NoteSkin = nil,
 				Mini = "0%",
 				BackgroundFilter = "Off",
-				SpeedModType = "x",
-				SpeedMod = 1.00,
-				Vocalization = "None",
-				NoteSkin = nil,
+
 				HideTargets = false,
 				HideSongBG = false,
 				HideCombo = false,
@@ -18,29 +20,25 @@ local PlayerDefaults = {
 				HideScore = false,
 				HideDanger = false,
 				HideComboExplosions = false,
+
 				ColumnFlashOnMiss = false,
 				SubtractiveScoring = false,
+				MeasureCounter = "None",
 				MeasureCounterLeft = true,
 				MeasureCounterUp = false,
-				MeasureCounter = "None",
-				DataVisualizations = "Disabled",
+				DataVisualizations = "None",
 				TargetScore = 11,
 				ActionOnMissedTarget = "Nothing",
 				Pacemaker = false,
-				ReceptorArrowsPosition = "StomperZ",
 				LifeMeterType = "Standard",
 				MissBecauseHeld = false,
 				NPSGraphAtTop = false,
-				Vocalization = "None",
 			}
 			self.Streams = {
 				SongDir = nil,
 				StepsType = nil,
 				Difficulty = nil,
 				Measures = nil,
-			}
-			self.NoteDensity = {
-				Peak = nil
 			}
 			self.HighScores = {
 				EnteringName = false,
@@ -49,9 +47,13 @@ local PlayerDefaults = {
 			self.Stages = {
 				Stats = {}
 			}
-			self.CurrentPlayerOptions = {
-				String = nil
-			}
+			self.PlayerOptionsString = nil
+
+			-- default panes to intialize ScreenEvaluation to
+			-- when only a single player is joined
+			-- these won't be used in versus; both panes will initialize to Pane1
+			self.EvalPanePrimary   = 1 -- large score and judgment counts
+			self.EvalPaneSecondary = 4 -- offset histogram
 		end
 	}
 }
@@ -64,7 +66,7 @@ local GlobalDefaults = {
 		initialize = function(self)
 			self.ActiveModifiers = {
 				MusicRate = 1.0,
-				WorstTimingWindow = 5,
+				TimingWindows = {true, true, true, true, true},
 			}
 			self.Stages = {
 				PlayedThisGame = 0,
@@ -73,11 +75,12 @@ local GlobalDefaults = {
 			}
 			self.ScreenAfter = {
 				PlayAgain = "ScreenEvaluationSummary",
-				PlayerOptions = "ScreenGameplay",
-				PlayerOptions2 = "ScreenGameplay"
+				PlayerOptions  = "ScreenGameplay",
+				PlayerOptions2 = "ScreenGameplay",
+				PlayerOptions3 = "ScreenGameplay",
 			}
 			self.ContinuesRemaining = ThemePrefs.Get("NumberOfContinuesAllowed") or 0
-			self.GameMode = ThemePrefs.Get("DefaultGameMode") or "Competitive"
+			self.GameMode = ThemePrefs.Get("DefaultGameMode") or "ITG"
 			self.ScreenshotTexture = nil
 			self.MenuTimer = {
 				ScreenSelectMusic = ThemePrefs.Get("ScreenSelectMusicMenuTimer"),
@@ -88,6 +91,8 @@ local GlobalDefaults = {
 				ScreenNameEntry = ThemePrefs.Get("ScreenNameEntryMenuTimer"),
 			}
 			self.TimeAtSessionStart = nil
+
+			self.GameplayReloadCheck = false
 		end,
 
 		-- These values outside initialize() won't be reset each game cycle,
@@ -102,8 +107,25 @@ SL = {
 	P1 = setmetatable( {}, PlayerDefaults),
 	P2 = setmetatable( {}, PlayerDefaults),
 	Global = setmetatable( {}, GlobalDefaults),
+
 	-- Colors that Simply Love's background can be
+	-- These colors are used for text on dark backgrounds and backgrounds containing dark text:
 	Colors = {
+		"#FF5D47",
+		"#FF577E",
+		"#FF47B3",
+		"#DD57FF",
+		"#8885ff",
+		"#3D94FF",
+		"#00B8CC",
+		"#5CE087",
+		"#AEFA44",
+		"#FFFF00",
+		"#FFBE00",
+		"#FF7D00",
+	},
+	-- These are the original SL colors. They're used for decorative (non-text) elements, like the background hearts:
+	DecorativeColors = {
 		"#FF3C23",
 		"#FF003C",
 		"#C1006F",
@@ -117,51 +139,44 @@ SL = {
 		"#FFBE00",
 		"#FF7D00"
 	},
+	-- These judgment colors are used for text & numbers on dark backgrounds:
 	JudgmentColors = {
 		Casual = {
 			color("#21CCE8"),	-- blue
 			color("#e29c18"),	-- gold
 			color("#66c955"),	-- green
-			color("#5b2b8e"),	-- purple
+			color("#b45cff"),	-- purple (greatly lightened)
 			color("#c9855e"),	-- peach?
-			color("#ff0000")	-- red
+			color("#ff3030")	-- red (slightly lightened)
 		},
-		Competitive = {
+		ITG = {
 			color("#21CCE8"),	-- blue
 			color("#e29c18"),	-- gold
 			color("#66c955"),	-- green
-			color("#5b2b8e"),	-- purple
+			color("#b45cff"),	-- purple (greatly lightened)
 			color("#c9855e"),	-- peach?
-			color("#ff0000")	-- red
+			color("#ff3030")	-- red (slightly lightened)
 		},
-		ECFA = {
+		["FA+"] = {
 			color("#21CCE8"),	-- blue
 			color("#ffffff"),	-- white
 			color("#e29c18"),	-- gold
 			color("#66c955"),	-- green
-			color("#5b2b8e"),	-- purple
-			color("#ff0000")	-- red
+			color("#b45cff"),	-- purple (greatly lightened)
+			color("#ff3030")	-- red (slightly lightened)
 		},
-		StomperZ = {
-			color("#5b2b8e"),	-- purple
-			color("#0073ff"),	-- dark blue
-			color("#66c955"),	-- green
-			color("#e29c18"),	-- gold
-			color("#dddddd"),	-- grey
-			color("#ff0000")	-- red
-		}
 	},
 	Preferences = {
 		Casual = {
-			TimingWindowAdd=ThemePrefs.Get("TimingWindowAdd"),
+			TimingWindowAdd=0.0015,
 			RegenComboAfterMiss=0,
 			MaxRegenComboAfterMiss=0,
 			MinTNSToHideNotes="TapNoteScore_W3",
-			HarshHotLifePenalty=1,
+			HarshHotLifePenalty=true,
 
-			PercentageScoring=1,
+			PercentageScoring=true,
 			AllowW1="AllowW1_Everywhere",
-			SubSortByNumSteps=1,
+			SubSortByNumSteps=true,
 
 			TimingWindowSecondsW1=0.021500,
 			TimingWindowSecondsW2=0.043000,
@@ -172,16 +187,16 @@ SL = {
 			TimingWindowSecondsMine=0.070000,
 			TimingWindowSecondsRoll=0.350000,
 		},
-		Competitive = {
-			TimingWindowAdd=ThemePrefs.Get("TimingWindowAdd"),
+		ITG = {
+			TimingWindowAdd=0.0015,
 			RegenComboAfterMiss=5,
 			MaxRegenComboAfterMiss=10,
 			MinTNSToHideNotes="TapNoteScore_W3",
-			HarshHotLifePenalty=1,
+			HarshHotLifePenalty=true,
 
-			PercentageScoring=1,
+			PercentageScoring=true,
 			AllowW1="AllowW1_Everywhere",
-			SubSortByNumSteps=1,
+			SubSortByNumSteps=true,
 
 			TimingWindowSecondsW1=0.021500,
 			TimingWindowSecondsW2=0.043000,
@@ -192,16 +207,16 @@ SL = {
 			TimingWindowSecondsMine=0.070000,
 			TimingWindowSecondsRoll=0.350000,
 		},
-		ECFA = {
+		["FA+"] = {
 			TimingWindowAdd=0.0015,
 			RegenComboAfterMiss=5,
 			MaxRegenComboAfterMiss=10,
 			MinTNSToHideNotes="TapNoteScore_W4",
-			HarshHotLifePenalty=1,
+			HarshHotLifePenalty=true,
 
-			PercentageScoring=1,
+			PercentageScoring=true,
 			AllowW1="AllowW1_Everywhere",
-			SubSortByNumSteps=1,
+			SubSortByNumSteps=true,
 
 			TimingWindowSecondsW1=0.011000,
 			TimingWindowSecondsW2=0.021500,
@@ -210,26 +225,6 @@ SL = {
 			TimingWindowSecondsW5=0.135000,
 			TimingWindowSecondsHold=0.320000,
 			TimingWindowSecondsMine=0.065000,
-			TimingWindowSecondsRoll=0.350000,
-		},
-		StomperZ = {
-			TimingWindowAdd=0,
-			RegenComboAfterMiss=0,
-			MaxRegenComboAfterMiss=0,
-			MinTNSToHideNotes="TapNoteScore_W4",
-			HarshHotLifePenalty=0,
-
-			PercentageScoring=1,
-			AllowW1="AllowW1_Everywhere",
-			SubSortByNumSteps=1,
-
-			TimingWindowSecondsW1=0.012500,
-			TimingWindowSecondsW2=0.025000,
-			TimingWindowSecondsW3=0.050000,
-			TimingWindowSecondsW4=0.100000,
-			TimingWindowSecondsW5=0.10000,
-			TimingWindowSecondsHold=0.20000,
-			TimingWindowSecondsMine=0.070000,
 			TimingWindowSecondsRoll=0.350000,
 		},
 	},
@@ -265,7 +260,7 @@ SL = {
 			LifePercentChangeHeld=0,
 			LifePercentChangeHitMine=0,
 		},
-		Competitive = {
+		ITG = {
 			PercentScoreWeightW1=5,
 			PercentScoreWeightW2=4,
 			PercentScoreWeightW3=2,
@@ -296,7 +291,7 @@ SL = {
 			LifePercentChangeHeld=IsGame("pump") and 0.000 or 0.008,
 			LifePercentChangeHitMine=-0.050,
 		},
-		ECFA = {
+		["FA+"] = {
 			PercentScoreWeightW1=5,
 			PercentScoreWeightW2=5,
 			PercentScoreWeightW3=4,
@@ -327,43 +322,12 @@ SL = {
 			LifePercentChangeHeld=0.008,
 			LifePercentChangeHitMine=-0.05,
 		},
-		StomperZ = {
-			PercentScoreWeightW1=10,
-			PercentScoreWeightW2=9,
-			PercentScoreWeightW3=8,
-			PercentScoreWeightW4=5,
-			PercentScoreWeightW5=0,
-			PercentScoreWeightMiss=0,
-			PercentScoreWeightLetGo=0,
-			PercentScoreWeightHeld=10,
-			PercentScoreWeightHitMine=-5,
-
-			GradeWeightW1=10,
-			GradeWeightW2=9,
-			GradeWeightW3=8,
-			GradeWeightW4=5,
-			GradeWeightW5=0,
-			GradeWeightMiss=0,
-			GradeWeightLetGo=0,
-			GradeWeightHeld=10,
-			GradeWeightHitMine=-5,
-
-			LifePercentChangeW1=0.004,
-			LifePercentChangeW2=0.004,
-			LifePercentChangeW3=0.004,
-			LifePercentChangeW4=0.004,
-			LifePercentChangeW5=0,
-			LifePercentChangeMiss=-0.04,
-			LifePercentChangeLetGo=-0.04,
-			LifePercentChangeHeld=0,
-			LifePercentChangeHitMine=-0.04,
-		},
 	}
 }
 
 
--- Initialize preferences by calling this method.
--- We typically do this from ./BGAnimations/ScreenTitleMenu underlay/default.lua
+-- Initialize preferences by calling this method.  We typically do
+-- this from ./BGAnimations/ScreenTitleMenu underlay/default.lua
 -- so that preferences reset between each game cycle.
 
 function InitializeSimplyLove()
@@ -372,5 +336,4 @@ function InitializeSimplyLove()
 	SL.Global:initialize()
 end
 
--- TODO: remove this; it's for debugging purposes (Control+F2 to reload scripts) only
 InitializeSimplyLove()
