@@ -13,7 +13,8 @@ local jcT = {}
 local jdgT = {
 	TapNoteScore_W1 = SL.JudgmentColors[SL.Global.GameMode][1],
 	TapNoteScore_W2 = SL.JudgmentColors[SL.Global.GameMode][2],
-	TapNoteScore_W3 = SL.JudgmentColors[SL.Global.GameMode][3]
+	TapNoteScore_W3 = SL.JudgmentColors[SL.Global.GameMode][3],
+	TapNoteScore_W3 = SL.JudgmentColors[SL.Global.GameMode][4]
 }
 
 local dvCur
@@ -28,16 +29,16 @@ end
 
 -- User Parameters
 --==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--
-local barcount = 30 									-- Number of bars. Older bars will refresh if judgments/barDuration exceeds this value. You don't need more than 40.
+local barcount = 20 									-- Number of bars. Older bars will refresh if judgments/barDuration exceeds this value. You don't need more than 40.
 local frameX = CenterX 									-- X Positon (Center of the bar)
 local frameY = SCREEN_CENTER_Y-60				        -- Y Positon (Center of the bar)
 local frameHeight = 20 									-- Height of the bar
 local frameWidth = 400                               	-- Width of the bar
 local barWidth = 2										-- Width of the ticks.
-local barDuration = 0.75 								-- Time duration in seconds before the ticks fade out. Doesn't need to be higher than 1. Maybe if you have 300 bars I guess.
+local barDuration = 0.5 								-- Time duration in seconds before the ticks fade out. Doesn't need to be higher than 1. Maybe if you have 300 bars I guess.
 --==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--
 
-local wscale = 800 										-- so we aren't calculating it over and over again
+local wscale = 1300 									-- so we aren't calculating it over and over again
 local currentbar = 1 									-- so we know which error bar we need to update
 local ingots = {}										-- references to the error bars
 

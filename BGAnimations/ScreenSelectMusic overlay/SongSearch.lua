@@ -20,6 +20,9 @@ t = Def.ActorFrame{
                         Question = "Song name",
                         MaxInputLength = 255,
                         OnOK = function(answer)
+							if string.len(answer) == 0 then
+								return
+							end
 				-- case insensitive search for a string
 				-- in every song's title and subtitle
                                 local results = {}

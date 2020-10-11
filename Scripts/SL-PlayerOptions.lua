@@ -450,10 +450,6 @@ local Overrides = {
 		Values = { "MissBecauseHeld", "NPSGraphAtTop", "ErrorBar" }
 	},
 	-------------------------------------------------------------------------
-	DangerScream = {
-		Values = function() return { "Enabled", "Disabled" } end,
-	},
-	-------------------------------------------------------------------------
 	MeasureCounter = {
 		Values = { "None", "8th", "12th", "16th", "24th", "32nd" },
 	},

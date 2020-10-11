@@ -24,7 +24,6 @@ local profile_whitelist = {
 	HideScore = "boolean",
 	HideDanger = "boolean",
 	HideComboExplosions = "boolean",
-	DangerScream = "string",
 
 	LifeMeterType = "string",
 	DataVisualizations = "string",
@@ -41,7 +40,7 @@ local profile_whitelist = {
 	Pacemaker = "boolean",
 	MissBecauseHeld = "boolean",
 	NPSGraphAtTop = "boolean",
-	NPSGraphAtTop = "boolean",
+	ErrorBar = "boolean",
 
 	ReceptorArrowsPosition = "string",
 
