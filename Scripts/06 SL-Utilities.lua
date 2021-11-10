@@ -170,3 +170,11 @@ function map(func, array)
 	end
 	return new_array
 end
+
+function MusicWheelItemType()
+	return "MusicWheelItemHorizontal"
+end
+
+function TextBannerType()
+	return "TextBannerHorizontal"
+end

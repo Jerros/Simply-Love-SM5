@@ -129,8 +129,6 @@ local GlobalDefaults = {
 -- "SL" is a general-purpose table that can be accessed from anywhere
 -- within the theme and stores info that needs to be passed between screens
 SL = {
-	P1 = setmetatable( {}, PlayerDefaults),
-	P2 = setmetatable( {}, PlayerDefaults),
 	Global = setmetatable( {}, GlobalDefaults),
 
 	-- Colors that Simply Love's background can be
@@ -400,14 +398,20 @@ SL = {
 	}
 }
 
+for i = 1, NUM_PLAYERS do
+	SL["P" .. i] = setmetatable( {}, PlayerDefaults)
+end
+
 
 -- Initialize preferences by calling this method.  We typically do
 -- this from ./BGAnimations/ScreenTitleMenu underlay/default.lua
 -- so that preferences reset between each game cycle.
 
 function InitializeSimplyLove()
-	SL.P1:initialize()
-	SL.P2:initialize()
+	for i = 1, NUM_PLAYERS do
+		SL["P" .. i]:initialize()
+	end
+
 	SL.Global:initialize()
 end
 

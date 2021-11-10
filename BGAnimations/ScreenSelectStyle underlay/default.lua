@@ -6,28 +6,29 @@ local current_game = GAMESTATE:GetCurrentGame():GetName()
 
 local choices = {
 	{
-		name="single",
+		name="versus4",
 		x=_screen.cx-SL_WideScale(160, 214),
 		pads = {
 			{color=GetHexColor(SL.Global.ActiveColorIndex, true), offset=0}
-		}
+		},
+		centerText = "4"
 	},
 	{
-		name="versus",
+		name="versus6",
 		x=_screen.cx,
 		pads = {
-			{color=GetHexColor(SL.Global.ActiveColorIndex-1, true), offset=-SL_WideScale(42,51)},
-			{color=GetHexColor(SL.Global.ActiveColorIndex+2, true), offset= SL_WideScale(42,51)}
-		}
+			{color=GetHexColor(SL.Global.ActiveColorIndex, true), offset=0}
+		},
+		centerText = "6"
 	},
 	{
-		name="double",
+		name="versus8",
 		x=_screen.cx+SL_WideScale(160, 214),
 		pads = {
-			{color=GetHexColor(SL.Global.ActiveColorIndex+1, true), offset=-SL_WideScale(42,51)},
-			{color=GetHexColor(SL.Global.ActiveColorIndex+1, true), offset= SL_WideScale(42,51)}
-		}
-	},
+			{color=GetHexColor(SL.Global.ActiveColorIndex, true), offset=0}
+		},
+		centerText = "8"
+	}
 }
 
 if current_game=="dance" and ThemePrefs.Get("AllowDanceSolo") then
@@ -121,10 +122,32 @@ local GetNextEnabledChoice = function(dir)
 end
 
 local JoinOrUnjoinPlayersMaybe = function(style, player)
-	-- if going into versus, ensure that both players are joined
+	-- if going into versus, ensure that all players are joined
+	
 	if style == "versus" then
-		for player in ivalues( PlayerNumber ) do
-			if not GAMESTATE:IsHumanPlayer(player) then GAMESTATE:JoinPlayer(player) end
+		for i = 1, 2 do
+			if not GAMESTATE:IsHumanPlayer(i-1) then GAMESTATE:JoinPlayer(i-1) end
+		end
+		return
+	end
+	
+	if style == "versus4" then
+		for i = 1, 4 do
+			if not GAMESTATE:IsHumanPlayer(i-1) then GAMESTATE:JoinPlayer(i-1) end
+		end
+		return
+	end
+	
+	if style == "versus6" then
+		for i = 1, 6 do
+			if not GAMESTATE:IsHumanPlayer(i-1) then GAMESTATE:JoinPlayer(i-1) end
+		end
+		return
+	end
+	
+	if style == "versus8" then
+		for i = 1, 8 do
+			if not GAMESTATE:IsHumanPlayer(i-1) then GAMESTATE:JoinPlayer(i-1) end
 		end
 		return
 	end

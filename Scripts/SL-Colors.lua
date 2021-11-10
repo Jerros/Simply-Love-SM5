@@ -34,8 +34,13 @@ function GetCurrentColor( decorative )
 end
 
 function PlayerColor( pn, decorative )
-	if pn == PLAYER_1 then return GetHexColor(SL.Global.ActiveColorIndex, decorative) end
-	if pn == PLAYER_2 then return GetHexColor(SL.Global.ActiveColorIndex-2, decorative) end
+	local r = PlayerNumber:Reverse()
+	local playerNum = r[pn]
+
+	if playerNum >= 0 and playerNum < NUM_PLAYERS then
+		return GetHexColor(SL.Global.ActiveColorIndex - (playerNum * 2), decorative)
+	end
+	
 	return Color.White
 end
 

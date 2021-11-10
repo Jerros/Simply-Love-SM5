@@ -1,4 +1,4 @@
-local color_used, color_unused, padNum, style = unpack(...)
+local color_used, color_unused, padNum, style, centerText = unpack(...)
 
 color_used   = color_used   or {1, 1, 1, 1.0}
 color_unused = color_unused or (DarkUI() and {0.25,0.25,0.25,1} or {1, 1, 1, 0.3})
@@ -50,18 +50,29 @@ for row=0,2 do
 
 			self:GetParent():playcommand("Reassess", layout)
 		end
-
-		panel_af[#panel_af+1] = LoadActor("rounded-square.png")..{
-			InitCommand=function(self) init_panel(self, col, row, zoom) end,
-			ReassessCommand=function(self, layout)
-				if layout[panel_index] then
-					self:diffuse(color_used)
-				else
-					self:diffuse(color_unused)
+		
+		if ThemePrefs.Get("ManyPlayers") and panel_index == 5 then
+			panel_af[#panel_af+1] = LoadFont("Common Bold")..{
+				Text=centerText,
+				InitCommand=function(self)
+					init_panel(self, col, row, zoom)
 				end
-			end
-		}
+			}
+		else
+			panel_af[#panel_af+1] = LoadActor("rounded-square.png")..{
+				InitCommand=function(self) init_panel(self, col, row, zoom) end,
+				ReassessCommand=function(self, layout)
+					if layout[panel_index] then
+						self:diffuse(color_used)
+					else
+						self:diffuse(color_unused)
+					end
+				end
+			}
 
+		end
+
+		
 		pad[#pad+1] = panel_af
 	end
 end

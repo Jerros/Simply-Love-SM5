@@ -3,6 +3,10 @@ local choiceName = args[1].name
 local frame_x = args[1].x
 local pads = args[1].pads
 local choice_index = args[2]
+local centerText = ""
+if ThemePrefs.Get("ManyPlayers") then
+	centerText = args[3]
+end
 
 -- -----------------------------------------------------------------------
 
@@ -59,7 +63,7 @@ local af = Def.ActorFrame{
 
 -- draw as many pads as needed for this choice
 for i, pad in ipairs(pads) do
-	af[#af+1] = LoadActor("./pad.lua", {pad.color, {0.2,0.2,0.2,1}, i, choiceName})..{
+	af[#af+1] = LoadActor("./pad.lua", {pad.color, {0.2,0.2,0.2,1}, i, choiceName, centerText})..{
 		InitCommand=function(self)
 			self:x(pad.offset):playcommand("Set")
 		end,

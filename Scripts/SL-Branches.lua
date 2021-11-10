@@ -51,7 +51,11 @@ SelectMusicOrCourse = function()
 			return "ScreenSelectMusicCasual"
 		end
 
-		return "ScreenSelectMusic"
+		if ThemePrefs.Get("ManyPlayers") then
+			return "ScreenSelectMusicManyPlayers"
+		end
+		
+		return "ScreenSelectMusiccc"
 	end
 end
 
@@ -117,6 +121,10 @@ end
 
 
 Branch.AfterGameplay = function()
+	if ThemePrefs.Get("ManyPlayers") then
+		return "ScreenEvaluationManyPlayers"
+	end
+	
 	if THEME:GetMetric("ScreenHeartEntry", "HeartEntryEnabled") then
 		local go_to_heart= false
 		for i, pn in ipairs(GAMESTATE:GetEnabledPlayers()) do
@@ -148,6 +156,10 @@ Branch.AfterSelectMusic = function()
 		local style = GAMESTATE:GetCurrentStyle():GetName()
 		if style == "routine" then
 			return "ScreenGameplayShared"
+		end
+		
+		if ThemePrefs.Get("ManyPlayers") then
+			return "ScreenGameplayManyPlayers"
 		end
 
 		-- while everything else (single, versus, double, etc.) uses ScreenGameplay
