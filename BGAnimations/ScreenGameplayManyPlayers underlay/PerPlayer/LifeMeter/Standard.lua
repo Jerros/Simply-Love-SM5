@@ -1,10 +1,8 @@
 local player = ...
-local playerNumberReverse = PlayerNumber:Reverse()
-local playerNumer = playerNumberReverse[player]
 
-local w = PlayFieldWidth() - 150
+local w = PlayFieldWidth()-38
 local h = 22
-local _x = GetPlayerPlayfieldX(playerNumer) - 30
+local _x = GetPlayerPlayfieldX(player) - (PlayFieldWidth() / 2) + 42
 
 -- get SongPosition specific to this player so that
 -- split BPMs are handled if there are any
@@ -20,18 +18,18 @@ end
 
 local meter = Def.ActorFrame{
 
-	InitCommand=function(self) self:y(50):SetUpdateFunction(Update):visible(false) end,
+	InitCommand=function(self) self:y(50):SetUpdateFunction(Update):visible(false):horizalign(left) end,
 	OnCommand=function(self) self:visible(true) end,
 
 	-- frame
-	Def.Quad{ InitCommand=function(self) self:x(_x):zoomto(w+4, h+4) end },
-	Def.Quad{ InitCommand=function(self) self:x(_x):zoomto(w, h):diffuse(0,0,0,1) end },
+	Def.Quad{ InitCommand=function(self) self:horizalign(left):x((_x)-2):zoomto(w+4, h+4) end },
+	Def.Quad{ InitCommand=function(self) self:horizalign(left):x((_x)):zoomto(w, h):diffuse(0,0,0,1) end },
 
 	-- the Quad that changes width/color depending on current Life
 	Def.Quad{
 		Name="MeterFill",
 		InitCommand=function(self) self:zoomto(0,h):diffuse(PlayerColor(player,true)):horizalign(left) end,
-		OnCommand=function(self) self:x( _x - w/2 ) end,
+		OnCommand=function(self) self:x( _x ) end,
 
 		-- check whether the player's LifeMeter is "Hot"
 		-- in LifeMeterBar.cpp, the engine says a LifeMeter is Hot if the current
@@ -70,7 +68,7 @@ local meter = Def.ActorFrame{
 				 :horizalign( left )
 		end,
 		OnCommand=function(self)
-			self:x(_x - w/2)
+			self:x(_x)
 			self:customtexturerect(0,0,1,1)
 			--texcoordvelocity is handled by the Update function below
 		end,

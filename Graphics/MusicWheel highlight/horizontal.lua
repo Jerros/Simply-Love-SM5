@@ -1,5 +1,5 @@
-local w = 160 + 20
-local h = 80 + 20
+local w = 140 + 20
+local h = 60 + 20
 local y = 0
 
 return Def.ActorFrame {

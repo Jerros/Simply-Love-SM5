@@ -572,3 +572,31 @@ end
 IsAutoplay = function(player)
 	return GAMESTATE:GetPlayerState(player):GetPlayerController() ~= "PlayerController_Human"
 end
+
+function MusicWheelItemProp(field)
+	local wheelType = ScreenMetric("MusicWheelType")
+	
+	if field == 'SectionCountX' then
+		if wheelType == 'MusicWheelHorizontal' then
+			return 0
+		end
+		
+		return _screen.w/2 - WideScale(9, 10)
+	end
+	
+	if field == 'SectionCountY' then
+		if wheelType == 'MusicWheelHorizontal' then
+			return 20
+		end
+		
+		return 0
+	end
+	
+	if field == 'SectionExpandedX' or field == 'SectionCollapsedX' or field == 'RouletteX' or field == 'RandomX' or field == 'PortalX' then
+		if wheelType == 'MusicWheelHorizontal' then
+			return 0
+		end
+		
+		return WideScale(150, 204)
+	end
+end

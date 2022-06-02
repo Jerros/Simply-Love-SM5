@@ -3,8 +3,8 @@ local args = ...
 local color1 = args[1]
 local color2 = args[2]
 
-local w = 160
-local h = 80
+local w = 140
+local h = 60
 local y = 0
 
 if color1 == "quad" then

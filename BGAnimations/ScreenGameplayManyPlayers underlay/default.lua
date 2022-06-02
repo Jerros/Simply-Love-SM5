@@ -18,10 +18,10 @@ t[#t+1] = LoadActor("./Shared/SongInfoBar.lua") -- song title and progress bar
 for player in ivalues(Players) do
 	local opts = GAMESTATE:GetPlayerState(player):GetCurrentPlayerOptions()
 	local layout = GetGameplayLayout(player, opts:Reverse() ~= 0)
-
-	t[#t+1] = LoadActor("./PerPlayer/Score.lua", player)
+	
 	t[#t+1] = LoadActor("./PerPlayer/DifficultyMeter.lua", player)
 	t[#t+1] = LoadActor("./PerPlayer/LifeMeter/default.lua", player)
+	t[#t+1] = LoadActor("./PerPlayer/Score.lua", player)
 end
 
 -- add to the ActorFrame last; overlapped by StepStatistics otherwise

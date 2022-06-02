@@ -41,4 +41,6 @@ local af = Def.ActorFrame{
 	LoadActor("./SongSearch/default.lua"),
 }
 
+LoadActor("./../ScreenPlayerOptions overlay/OptionRowPreviews/NoteSkin.lua", af)
+
 return af

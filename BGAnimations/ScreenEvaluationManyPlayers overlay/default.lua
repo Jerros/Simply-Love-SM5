@@ -5,10 +5,13 @@ if ThemePrefs.Get("WriteCustomScores") then
 	WriteScores()
 end
 
-local t = Def.ActorFrame{Name="ScreenEval Common"}
-
--- -----------------------------------------------------------------------
--- First, add actors that would be the same whether x players are joined.
+local t = Def.ActorFrame{
+	Name="ScreenEval Common",
+	OnCommand=function(self)
+		local InputHandler = LoadActor("./InputHandler.lua", {self, 2})
+		SCREENMAN:GetTopScreen():AddInputCallback(InputHandler)
+	end
+}
 
 -- the title of the song and its graphical banner, if there is one
 t[#t+1] = LoadActor("./Shared/TitleAndBanner.lua")
@@ -21,10 +24,7 @@ t[#t+1] = LoadActor("./Shared/BPM_RateMod.lua")
 t[#t+1] = LoadActor("./Shared/GlobalStorage.lua")
 
 
--- -----------------------------------------------------------------------
--- Then, load player-specific actors.
-
-t[#t+1] = LoadActor("./PerPlayer/default.lua")
+t[#t+1] = LoadActor("./Panes/default.lua")
 
 for player in ivalues(Players) do
 

@@ -13,8 +13,6 @@ local t = Def.ActorFrame{
 
 	OnCommand=function(self)                           self:queuecommand("RedrawStepsDisplay") end,
 	CurrentSongChangedMessageCommand=function(self)    self:queuecommand("RedrawStepsDisplay") end,
-	CurrentStepsP1ChangedMessageCommand=function(self) self:queuecommand("RedrawStepsDisplay") end,
-	CurrentStepsP2ChangedMessageCommand=function(self) self:queuecommand("RedrawStepsDisplay") end,
 
 	RedrawStepsDisplayCommand=function(self)
 
@@ -26,7 +24,7 @@ local t = Def.ActorFrame{
 			if steps then
 				local StepsToDisplay = GetStepsToDisplay(steps)
 
-				for i=1,5 do
+				for i=1,7 do
 					if StepsToDisplay[i] then
 						-- if this particular song has a stepchart for this row, update the Meter
 						-- and BlockRow coloring appropriately
@@ -60,13 +58,13 @@ local Grid = Def.ActorFrame{
 	InitCommand=function(self) end,
 }
 
-for RowNumber=-2, 2 do
+for RowNumber=1,7 do
 	Grid[#Grid+1] = Def.Quad{
-		Name="MeterBackground_"..(RowNumber + 3),
+		Name="MeterBackground_"..RowNumber,
 		InitCommand=function(self)
 			local height = 28
 			local spacing = 2
-			self:diffuse(color("#0f0f0f")):zoomto(height, height):x((height+spacing)*RowNumber)
+			self:diffuse(color("#0f0f0f")):zoomto(height, height):x((height+spacing)*RowNumber - 120)
 			if ThemePrefs.Get("RainbowMode") then
 				self:diffusealpha(0.9)
 			end
@@ -74,11 +72,11 @@ for RowNumber=-2, 2 do
 	}
 
 	Grid[#Grid+1] = LoadFont("Common Bold")..{
-		Name="Meter_"..(RowNumber + 3),
+		Name="Meter_"..RowNumber,
 		InitCommand=function(self)
 			local height = 28
 			local spacing = 2
-			self:x((height+spacing)*RowNumber):zoom(0.45)
+			self:x((height+spacing)*RowNumber - 120):zoom(0.45)
 		end,
 		SetCommand=function(self, params)
 			-- diffuse and set each chart's difficulty meter
