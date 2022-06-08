@@ -17,4 +17,6 @@ return Def.ActorFrame{
 
 	-- numbers (How many Fantastics? How many Misses? etc.)
 	LoadActor("./JudgmentNumbers.lua", ...),
+
+	LoadActor("./LetterGrade.lua", ...),
 }

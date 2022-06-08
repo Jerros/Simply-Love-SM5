@@ -1,5 +1,5 @@
 local players = GAMESTATE:GetHumanPlayers()
-local NumPanes = 2
+local NumPanes = 3
 local af = Def.ActorFrame{}
 af.Name="Panes"
 

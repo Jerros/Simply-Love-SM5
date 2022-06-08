@@ -36,11 +36,11 @@ return function(event)
 
 	if event.type == "InputEventType_FirstPress" and panes[cn] then
 
-		if event.GameButton == "MenuRight" or event.GameButton == "MenuLeft" then
-			if event.GameButton == "MenuRight" then
+		if event.button == "Right" or event.button == "Left" then
+			if event.button == "Right" then
 				active_pane[cn] = (active_pane[cn] % #panes[cn]) + 1
 
-			elseif event.GameButton == "MenuLeft" then
+			elseif event.button == "Left" then
 				active_pane[cn] = ((active_pane[cn] - 2) % #panes[cn]) + 1
 			end
 

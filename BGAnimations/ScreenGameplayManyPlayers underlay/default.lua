@@ -8,6 +8,7 @@ local t = Def.ActorFrame{ Name="GameplayUnderlay" }
 
 for player in ivalues(Players) do
 	t[#t+1] = LoadActor("./PerPlayer/nice.lua", player)
+	t[#t+1] = LoadActor("./PerPlayer/BackgroundFilter.lua", player)
 end
 
 -- UI elements shared by both players

@@ -8,7 +8,7 @@ end
 local t = Def.ActorFrame{
 	Name="ScreenEval Common",
 	OnCommand=function(self)
-		local InputHandler = LoadActor("./InputHandler.lua", {self, 2})
+		local InputHandler = LoadActor("./InputHandler.lua", {self, 3})
 		SCREENMAN:GetTopScreen():AddInputCallback(InputHandler)
 	end
 }
