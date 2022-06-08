@@ -24,9 +24,9 @@ t[#t+1] = LoadActor("./Shared/BPM_RateMod.lua")
 t[#t+1] = LoadActor("./Shared/GlobalStorage.lua")
 
 
-t[#t+1] = LoadActor("./Panes/default.lua")
-
 for player in ivalues(Players) do
+
+	t[#t+1] = LoadActor("./PerPlayer/default.lua", player)
 
 	-- store player stats for later retrieval on EvaluationSummary and NameEntryTraditional
 	-- this doesn't draw anything to the screen, it just runs some code

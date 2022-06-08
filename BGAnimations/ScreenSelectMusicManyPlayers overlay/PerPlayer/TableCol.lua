@@ -14,12 +14,12 @@ local opts = {
 	'Noteskin'
 }
 
-local filterIndex = 1
-local FilterAlpha = {
-	Off = 0,
-	Dark = 0.5,
-	Darker = 0.75,
-	Darkest = 0.95
+local filterIndex = 2
+local filterOptions = {
+	{'Off', 0},
+	{'Dark', 0.1},
+	{'Darker', 0.2},
+	{'Darkest', 0.3}
 }
 
 local speed = 300
@@ -34,6 +34,14 @@ local t = Def.ActorFrame {
 		self:x(GetPlayerPlayfieldX(player))
 		self:setsize(w, h)
 		self:queuecommand("CurrentSongChangedMessage")
+
+		-- Reset all options
+		SL[pn].ActiveModifiers.SpeedMod     = speed
+		SL[pn].ActiveModifiers.SpeedModType = "M"
+		SL[pn].ActiveModifiers.NoteSkin = noteskins[noteskinIndex]
+		SL[pn].ActiveModifiers.BackgroundFilter = filterOptions[filterIndex][1]
+		ApplyMods(player);
+
 	end,
 	CurrentSongChangedMessageCommand=function(self)
 		local song = GAMESTATE:GetCurrentSong()
@@ -264,15 +272,16 @@ t[#t+1] = Def.ActorFrame {
 		self:visible(true)
 	end,
 	UpCommand=function(self)
-		if filter < 100 then
-			filter = filter + 10
-			SL[pn].ActiveModifiers.
+		if filterIndex < #filterOptions then
+			filterIndex = filterIndex + 1
+			SL[pn].ActiveModifiers.BackgroundFilter = filterOptions[filterIndex][1]
 			self:GetParent():playcommand("Redraw")
 		end
 	end,
 	DownCommand=function(self)
-		if filter > 0 then
-			filter = filter - 10
+		if filterIndex > 1 then
+			filterIndex = filterIndex - 1
+			SL[pn].ActiveModifiers.BackgroundFilter = filterOptions[filterIndex][1]
 			self:GetParent():playcommand("Redraw")
 		end
 	end,
@@ -293,9 +302,10 @@ t[#t+1] = Def.ActorFrame {
 			self:diffuse(color("#000000"))
 		end,
 		RedrawCommand=function(self)
-			if filter > 0 then
+			local filter = filterOptions[filterIndex]
+			if filter[0] ~= 'Off' then
 				self:visible(true)
-				self:diffusealpha(filter / 100)
+				self:diffusealpha(filter[2])
 			else
 				self:visible(false)
 			end
@@ -319,7 +329,6 @@ t[#t+1] = Def.ActorProxy{
 		self:SetTarget( offscreen_actor )
 	end,
 	UpCommand=function(self)
-		local i=1
 		noteskinIndex = noteskinIndex + 1
 		if noteskinIndex > #noteskins then
 			noteskinIndex = 1

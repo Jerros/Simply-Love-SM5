@@ -18,7 +18,6 @@ if color1 == "quad" then
 end
 
 return Def.ActorFrame{
-	-- the MusicWheel is centered via metrics under [ScreenSelectMusic]; offset by a slight amount to the right here
 	InitCommand=function(self)
 		self:y(y)
 		self:setsize(w, h)
@@ -26,8 +25,9 @@ return Def.ActorFrame{
 	Def.Quad{
 		InitCommand=function(self)
 			self
-				:diffuse(color1)
+				:diffuse(color2)
 				:zoomto(w, h) 
 		end
-	}
+	},
+	
 }

@@ -22,7 +22,15 @@ for player in ivalues(players) do
 	panes[player] = {}
 
 	for i=1,num_panes do
-		local pane = af:GetChild("Panes"):GetChild( ("Pane%i_Side%s"):format(i, pn) )
+		SM(("Payer%s"):format(pn))
+		SM(af:GetChild(("Payer%s"):format(pn)))
+		SM(af:GetChild(("Payer%s"):format(pn)):GetChild("Panes"))
+		SM(("Pane%i"):format(i))
+		SM(af:GetChild(("Payer%s"):format(pn)):GetChild("Panes"):GetChild(("Pane%i"):format(i)))
+		local pane = af:GetChild(("Payer%s"):format(pn))
+			:GetChild("Panes")
+			:GetChild(("Pane%i"):format(i))
+
 		pane:visible(i == primary_i)
 		active_pane[player] = primary_i
 		table.insert(panes[player], pane)

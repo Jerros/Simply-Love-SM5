@@ -1,23 +1,19 @@
-local t = Def.ActorFrame{ Name="PlayerTable" }
+local player = ...
 
-local padding = 5
-local height = 30
-local heigtTotal = height + padding
+return Def.ActorFrame{
+	Name="Player" .. ToEnumShortString(player),
 
-t[#t+1] = Def.Quad{
-	Name="BackgroundQuad",
-	InitCommand=function(self)
-		self:zoomtowidth(_screen.w * 0.8)
-		self:zoomtoheight(heigtTotal * #GAMESTATE:GetHumanPlayers() + padding )
-		
-		self:vertalign(top)
-		self:xy(_screen.cx, 200)
-		self:diffuse(color("#1e282f"))
-	end
+	Def.Quad{
+		InitCommand=function(self)
+			self:diffuse(color("#1E282F")):valign(0)
+			self:xy(GetPlayerPlayfieldX(player), 220)
+			self:zoomto( PlayFieldWidth()-60, 200 )
+	
+			if ThemePrefs.Get("RainbowMode") then
+				self:diffusealpha(0.9)
+			end
+		end
+	},
+
+	LoadActor("./Panes/default.lua", player)
 }
-
-for player in ivalues( GAMESTATE:GetHumanPlayers() ) do
-	t[#t+1] = LoadActor("./TableRow.lua", player)
-end
-
-return t
