@@ -1,7 +1,8 @@
 local player = ...
 local NumPanes = 3
-local af = Def.ActorFrame{}
-af.Name="Panes"
+local af = Def.ActorFrame{
+    Name="Panes"
+}
 
 local _x = GetPlayerPlayfieldX(player)
 local _y = 220

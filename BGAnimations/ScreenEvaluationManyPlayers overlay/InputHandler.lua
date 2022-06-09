@@ -22,12 +22,7 @@ for player in ivalues(players) do
 	panes[player] = {}
 
 	for i=1,num_panes do
-		SM(("Payer%s"):format(pn))
-		SM(af:GetChild(("Payer%s"):format(pn)))
-		SM(af:GetChild(("Payer%s"):format(pn)):GetChild("Panes"))
-		SM(("Pane%i"):format(i))
-		SM(af:GetChild(("Payer%s"):format(pn)):GetChild("Panes"):GetChild(("Pane%i"):format(i)))
-		local pane = af:GetChild(("Payer%s"):format(pn))
+		local pane = af:GetChild(("Player%s"):format(pn))
 			:GetChild("Panes")
 			:GetChild(("Pane%i"):format(i))
 

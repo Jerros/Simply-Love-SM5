@@ -8,7 +8,8 @@ local GetStepsToDisplay = LoadActor("./StepsToDisplay.lua")
 local t = Def.ActorFrame{
 	Name="StepsDisplayList",
 	InitCommand=function(self)
-	self:xy(_screen.cx, _screen.cy -16)
+	self:xy(0, _screen.cy -16)
+	self:SetWidth(320)
 	end,
 
 	OnCommand=function(self)                           self:queuecommand("RedrawStepsDisplay") end,

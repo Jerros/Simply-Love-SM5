@@ -6,12 +6,6 @@ return Def.ActorFrame {
 	InitCommand=function(self)
 		self:zoomto(w, h)
 	end,
-	OnCommand=function(self)
-		self:queuecommand("RealOn")
-	end,
-	OffCommand=function(self)
-		self:queuecommand("RealOff")
-	end,
 
 	Def.Quad{
 		RealOnCommand=function(self)

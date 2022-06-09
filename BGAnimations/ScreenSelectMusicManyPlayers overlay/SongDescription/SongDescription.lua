@@ -6,7 +6,7 @@ local _w = 320
 
 local af = Def.ActorFrame{
 	OnCommand=function(self)
-		self:xy(_screen.cx, _screen.cy - 55)
+		self:xy(0, _screen.cy - 55)
 	end,
 
 	CurrentSongChangedMessageCommand=function(self)    self:playcommand("Set") end,

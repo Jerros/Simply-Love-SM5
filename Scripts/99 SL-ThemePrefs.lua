@@ -30,8 +30,6 @@ SL_CustomPrefs.Get = function()
 			Choices = { 0,1,2,3,4,5,6,7,8,9 },
 			Values  = { 0,1,2,3,4,5,6,7,8,9 }
 		},
-
-
 		HideStockNoteSkins =
 		{
 			Default = false,
@@ -197,6 +195,12 @@ SL_CustomPrefs.Get = function()
 			Default = false,
 			Choices = { THEME:GetString("ThemePrefs","Yes"), THEME:GetString("ThemePrefs", "No") },
 			Values  = { true, false }
+		},
+		ScreenCount =
+		{
+			Default = 1,
+			Choices = { 1, 2, 3 },
+			Values  = { 1, 2, 3 }
 		},
 		AllowScreenNameEntry =
 		{

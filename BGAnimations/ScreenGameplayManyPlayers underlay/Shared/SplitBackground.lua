@@ -1,21 +1,26 @@
-return Def.ActorFrame{
+local ns = ThemePrefs.Get("ScreenCount")
+
+if ns < 2 then
+    return
+end
+
+local af = Def.ActorFrame{
     OnCommand=function(self)
         local bg = SCREENMAN:GetTopScreen():GetChild('SongBackground')
         bg:visible(false)
+    end
+}
 
-    end,
-    Def.ActorProxy{
+for i=1,ns do
+    af[#af+1] = Def.ActorProxy{
+        InitCommand=function(self) 
+            self:x(SubScreensX(i))
+        end,
         OnCommand=function(self)
             local bg = SCREENMAN:GetTopScreen():GetChild('SongBackground')
-            self:x(_screen.w * -0.25)
-            self:SetTarget(bg)
-        end
-    },
-    Def.ActorProxy{
-        OnCommand=function(self)
-            local bg = SCREENMAN:GetTopScreen():GetChild('SongBackground')
-            self:x(_screen.w * 0.25)
             self:SetTarget(bg)
         end
     }
-}
+end
+
+return af

@@ -73,7 +73,7 @@ for row_index, s in pairs(scores) do
 		row[#row+1] = Def.Quad{
 			InitCommand=function(self)
 				self:zoomto(140, row_height+2)
-				self:diffusealpha(0.1)
+				self:diffuseshift():effectcolor1(0.8,0.8,0.8,0.15):effectcolor2(0.1,0.1,0.1,0.15):effectclock("beatnooffset"):effectperiod(2)
 			end
 		}
 	end

@@ -6,7 +6,7 @@ end
 local Players = GAMESTATE:GetHumanPlayers()
 local t = Def.ActorFrame{ Name="GameplayUnderlay" }
 
--- t[#t+1] = LoadActor("./Shared/SplitBackground.lua")
+t[#t+1] = LoadActor("./Shared/SplitBackground.lua")
 
 for player in ivalues(Players) do
 	t[#t+1] = LoadActor("./PerPlayer/nice.lua", player)

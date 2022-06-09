@@ -24,13 +24,6 @@ local af = Def.ActorFrame{
 	-- elements we need two of (one for each player) that draw underneath the StepsDisplayList
 	-- this includes the stepartist boxes, the density graph, and the cursors.
 	LoadActor("./PerPlayer/default.lua"),
-	-- The grid for the difficulty picker (normal) or CourseContentsList (CourseMode)
-	LoadActor("./StepsDisplayList/default.lua"),
-
-	-- Banner Art
-	--LoadActor("./Banner.lua"),
-	-- Song's Musical Artist, BPM, Duration
-	LoadActor("./SongDescription/SongDescription.lua"),
 
 	-- ---------------------------------------------------
 	-- finally, load the overlay used for sorting the MusicWheel (and more), hidden by default
@@ -40,6 +33,35 @@ local af = Def.ActorFrame{
 
 	LoadActor("./SongSearch/default.lua"),
 }
+
+local ns = ThemePrefs.Get("ScreenCount")
+
+af[#af+1] = Def.ActorFrame{
+	Name="Clonable",
+	OnCommand=function(self)
+		self:halign(0.5)
+		self:x(SubScreensX(1))
+	end,
+	LoadActor("./StepsDisplayList/default.lua"),
+	LoadActor("./SongDescription/SongDescription.lua"),
+}
+
+if ns > 1 then
+	for i=2,ns do
+		af[#af+1] = Def.ActorProxy{
+			InitCommand=function(self) 
+				
+			end,
+			OnCommand=function(self)
+				local clonable = self:GetParent():GetChild("Clonable")
+				local _w = clonable:GetChild("StepsDisplayList"):GetWidth()
+				self:SetTarget(clonable)
+
+				self:x(_screen.cx)
+			end
+		}
+	end
+end
 
 LoadActor("./../ScreenPlayerOptions overlay/OptionRowPreviews/NoteSkin.lua", af)
 

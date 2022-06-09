@@ -2,7 +2,7 @@
 if SL.Global.GameMode == "Casual" then return end
 
 return Def.ActorFrame{
-	InitCommand=function(self) self:xy(_screen.cx, 175) end,
+	InitCommand=function(self) self:xy(0, 175) end,
 
 	--quad behind the MusicRate text
 	Def.Quad{
