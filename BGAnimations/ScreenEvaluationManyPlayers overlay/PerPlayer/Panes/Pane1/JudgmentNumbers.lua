@@ -17,7 +17,7 @@ local RadarCategories = {
 
 local t = Def.ActorFrame{
 	InitCommand=function(self)
-		self:xy(20, 40) 
+		self:xy(20, 20) 
 	end
 }
 

@@ -236,7 +236,7 @@ t[#t+1] = Def.ActorFrame {
 		if speed < 1000 then
 			speed = speed + 50
 			SL[pn].ActiveModifiers.SpeedMod     = speed
-			SL[pn].ActiveModifiers.SpeedModType = "C"
+			SL[pn].ActiveModifiers.SpeedModType = "M"
 			ApplyMods(player);
 			self:GetParent():playcommand("Redraw")
 		end
@@ -245,7 +245,7 @@ t[#t+1] = Def.ActorFrame {
 		if speed > 100 then
 			speed = speed - 50
 			SL[pn].ActiveModifiers.SpeedMod     = speed
-			SL[pn].ActiveModifiers.SpeedModType = "C"
+			SL[pn].ActiveModifiers.SpeedModType = "M"
 			ApplyMods(player);
 			self:GetParent():playcommand("Redraw")
 		end

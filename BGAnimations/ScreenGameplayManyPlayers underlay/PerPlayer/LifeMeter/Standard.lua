@@ -1,6 +1,6 @@
 local player = ...
 
-local w = PlayFieldWidth()-38
+local w = PlayFieldWidth()-45
 local h = 22
 local _x = GetPlayerPlayfieldX(player) - (PlayFieldWidth() / 2) + 42
 
@@ -38,7 +38,7 @@ local meter = Def.ActorFrame{
 		HealthStateChangedMessageCommand=function(self,params)
 			if params.PlayerNumber == player then
 				if params.HealthState == 'HealthState_Hot' then
-					self:diffuse(1,1,1,1)
+					self:diffuse(color("#ff0000"))
 				else
 					-- ~~man's~~ lifebar's not hot
 					self:diffuse( PlayerColor(player,true) )

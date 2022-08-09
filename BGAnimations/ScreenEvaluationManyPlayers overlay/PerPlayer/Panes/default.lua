@@ -5,8 +5,10 @@ local af = Def.ActorFrame{
 }
 
 local _x = GetPlayerPlayfieldX(player)
-local _y = 220
+local _y = 240
 local _w = PlayFieldWidth()-60
+
+
 
 for i=1, NumPanes do
     local pn   = ToEnumShortString(player)
@@ -18,6 +20,8 @@ for i=1, NumPanes do
         OnCommand=function(self) self:SetWidth(_w) end,
         pane
     }
+
+    af[#af+1] = LoadActor("./header.lua", {player})
 end
 
 return af

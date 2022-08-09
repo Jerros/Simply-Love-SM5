@@ -6,9 +6,10 @@ local zoom = 0.8
 
 local row_height = 20
 local columnX = {
-	-40,
-	0,
-	50,
+	-60,
+	-30,
+	30,
+	60
 }
 
 af[#af+1] = Def.ActorFrame{
@@ -24,6 +25,10 @@ af[#af+1] = Def.ActorFrame{
 	LoadFont("Common Normal")..{
 		Text="Score",
 		InitCommand=function(self) self:horizalign(right):xy(columnX[3], row_height):zoom(zoom)  end,
+	},
+	LoadFont("Common Normal")..{
+		Text="Level",
+		InitCommand=function(self) self:horizalign(right):xy(columnX[4], row_height):zoom(zoom)  end,
 	}
 }
 
@@ -36,7 +41,8 @@ for player in ivalues(players) do
 
 	table.insert(scores, {
 		player = player,
-		score = PercentDP
+		score = PercentDP,
+		steps = stats:GetPlayedSteps()[1]
 	})
 end
 
@@ -66,13 +72,17 @@ for row_index, s in pairs(scores) do
 		LoadFont("Common Normal")..{
 			Text=FormatPercentScore(s['score']),
 			InitCommand=function(self) self:horizalign(right):x(columnX[3]):zoom(zoom)  end,
+		},
+		LoadFont("Common Normal")..{
+			Text=s['steps']:GetMeter(),
+			InitCommand=function(self) self:horizalign(right):x(columnX[4]):zoom(zoom)  end,
 		}
 	}
 
 	if s['player'] == player then
 		row[#row+1] = Def.Quad{
 			InitCommand=function(self)
-				self:zoomto(140, row_height+2)
+				self:zoomto(170, row_height+2)
 				self:diffuseshift():effectcolor1(0.8,0.8,0.8,0.15):effectcolor2(0.1,0.1,0.1,0.15):effectclock("beatnooffset"):effectperiod(2)
 			end
 		}

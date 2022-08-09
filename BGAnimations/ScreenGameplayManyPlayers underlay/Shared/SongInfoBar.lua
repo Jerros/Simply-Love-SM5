@@ -1,10 +1,12 @@
-local w = _screen.w - 20
+local ns = ThemePrefs.Get("ScreenCount")
+local w = (_screen.w / ns) - 20
 local h = 22
 
--- Song Completion Meter
-return Def.ActorFrame{
+local af = Def.ActorFrame{}
+
+af[#af+1] = Def.ActorFrame{
 	Name="SongMeter",
-	InitCommand=function(self) self:xy(_screen.cx, 20) end,
+	InitCommand=function(self) self:xy(_screen.cx / ns, 20) end,
 
 	-- border
 	Def.Quad{ InitCommand=function(self) self:zoomto(w, h) end },
@@ -23,5 +25,18 @@ return Def.ActorFrame{
 			local song = GAMESTATE:GetCurrentSong()
 			self:settext( song and song:GetDisplayFullTitle() or "" )
 		end
-	}
+	},
+
+	-- LoadActor("./../../ScreenGameplay underlay/PerPlayer/StepStatistics/Time.lua")
 }
+
+if ns == 2 then
+	af[#af+1] = Def.ActorProxy{
+		OnCommand=function(self)
+			self:x(_screen.w / 2)
+			self:SetTarget(self:GetParent():GetChild("SongMeter"))
+		end
+	}
+end
+
+return af

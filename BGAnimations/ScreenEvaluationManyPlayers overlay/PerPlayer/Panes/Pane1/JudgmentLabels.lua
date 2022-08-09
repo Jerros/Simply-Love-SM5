@@ -43,7 +43,7 @@ end
 
 local t = Def.ActorFrame{
 	InitCommand=function(self)
-		self:xy(-10, 40)
+		self:xy(-10, 20)
 	end
 }
 

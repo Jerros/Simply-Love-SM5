@@ -7,14 +7,21 @@ end
 local af = Def.ActorFrame{
     OnCommand=function(self)
         local bg = SCREENMAN:GetTopScreen():GetChild('SongBackground')
+        bg:zoomx(0.5)
         bg:visible(false)
     end
 }
 
 for i=1,ns do
     af[#af+1] = Def.ActorProxy{
-        InitCommand=function(self) 
-            self:x(SubScreensX(i))
+        InitCommand=function(self)
+            --if i == 1 then
+                    
+            --end
+            if i == 2 then
+                self:x(_screen.w * 0.5)
+            end
+            
         end,
         OnCommand=function(self)
             local bg = SCREENMAN:GetTopScreen():GetChild('SongBackground')
